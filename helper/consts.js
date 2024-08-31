@@ -1,4 +1,4 @@
-module.exports = {
+export const CONSTS = {
   STATUS: {
     OK: 200,
     CREATED: 201,
@@ -7,5 +7,5 @@ module.exports = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
   },
-  SKIP_AUTHORIZATION: ["/user/create", "/user/login"],
+  SKIP_AUTHORIZATION: ['/user/create', '/user/login'],
 };

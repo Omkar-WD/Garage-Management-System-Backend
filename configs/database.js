@@ -1,6 +1,7 @@
-const mongoose = require("mongoose");
-require("dotenv").config({ path: "./.env" });
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
 
-module.exports = () => {
+export const mongoConnect =  () => {
   return mongoose.connect(process.env.MONGO_URL);
 };

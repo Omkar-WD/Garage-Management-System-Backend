@@ -1,27 +1,36 @@
-const express = require("express");
-const cors = require("cors");
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import { mongoConnect } from './configs/database.js';
+import { isValidUser } from './middlewares/auth.js';
+
+// import routers
+import userRouter from './routers/user.router.js';
+// import controllers
+import commonController from './controllers/common.controller.js';
+
+// app config
 const app = express();
-const connect = require("./configs/database");
-const isValidUser = require("./middlewares/auth");
-require("dotenv").config({ path: ".env" });
+dotenv.config({ path: '.env' });
 const PORT = process.env.PORT || 2345;
 
+// parsing input
 app.use(express.json());
 app.use(cors());
 
-const userController = require("./controllers/user.controller");
-const commonController = require("./controllers/common.controller");
-
+// authorization
 app.use(isValidUser);
 
-app.use("/user", userController);
-app.use("/*", commonController);
+// routes
+app.use('/user', userRouter);
+app.use('/*', commonController);
 
+// server
 app.listen(PORT, async () => {
   try {
-    await connect();
-    console.log("Listen at port", PORT);
+    await mongoConnect();
+    console.log('Listen at port', PORT);
   } catch (error) {
-    console.log("Received error while connecting to mongodb", error);
+    console.log('Received error while connecting to mongodb', error);
   }
 });

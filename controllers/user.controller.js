@@ -293,4 +293,23 @@ router.delete("/delete/:userId", async (req, res) => {
   }
 });
 
+// Edit User
+router.patch("/edit/:userId", async (req, res) => {
+  User.findByIdAndUpdate({ _id: req.params.userId }, req.body, { new: true, runValidators: true })
+    .then(updatedUser => {
+      if (!updatedUser) {
+        return res.status(CONSTS.STATUS.BAD_REQUEST).send('User not found');
+      }
+      res
+        .status(CONSTS.STATUS.OK)
+        .send({ success: true, message: "user details updated!", user: updatedUser });
+    })
+    .catch(error => {
+      return res
+        .status(CONSTS.STATUS.BAD_REQUEST)
+        .send({ success: false, message: error.message });
+    });
+
+});
+
 module.exports = router;

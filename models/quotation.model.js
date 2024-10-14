@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Vehicle = require("./vehicle.model");
+const Job = require("./job.model");
 
 const quotationSchema = new mongoose.Schema(
     {
@@ -20,10 +21,11 @@ const quotationSchema = new mongoose.Schema(
 );
 
 // Hook to update the Vehicle's quotations array when a Quotation is created
-quotationSchema.post('save', function (doc) {
-    if (doc.vehicleNumber) {
+quotationSchema.post('save', async function (doc) {
+    if (doc.job) {
+        const job = await Job.findById(doc.job).lean().exec();
         Vehicle.findByIdAndUpdate(
-            doc.vehicleNumber,
+            job.vehicleNumber,
             { $addToSet: { quotations: doc._id } }, // Add quotation ID to the quotations array
             { new: true }
         ).exec();
@@ -31,10 +33,11 @@ quotationSchema.post('save', function (doc) {
 });
 
 // Hook to remove quotation ID from Vehicle's quotations array when a Quotation is deleted
-quotationSchema.post('remove', function (doc) {
-    if (doc.vehicleNumber) {
+quotationSchema.post('remove', async function (doc) {
+    if (doc.job) {
+        const job = await Job.findById(doc.job).lean().exec();
         Vehicle.findByIdAndUpdate(
-            doc.vehicleNumber,
+            job.vehicleNumber,
             { $pull: { quotations: doc._id } }, // Remove quotation ID from the quotations array
             { new: true }
         ).exec();

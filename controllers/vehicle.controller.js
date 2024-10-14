@@ -30,7 +30,13 @@ router.post(
                     .send({ success: false, message: "Vehicle already exist" });
             }
             vehicle = await Vehicle.create(req.body);
-            vehicle = await Vehicle.findById(vehicle._id).populate('jobs');
+            vehicle = await Vehicle.findById(vehicle._id).populate({
+                path: 'jobs',
+                populate: { path: 'vehicleNumber' }
+            }).populate({
+                path: 'quotations',
+                populate: { path: 'job' }
+            });
 
             return res.status(CONSTS.STATUS.CREATED).send({
                 success: true,
@@ -50,7 +56,13 @@ router.get("/all-vehicles", async (req, res) => {
         const vehicles = await Vehicle.find(
             {}
         )
-            .populate('jobs')
+            .populate({
+                path: 'jobs',
+                populate: { path: 'vehicleNumber' }
+            }).populate({
+                path: 'quotations',
+                populate: { path: 'job' }
+            })
             .lean()
             .exec();
         return res.status(CONSTS.STATUS.OK).send({ success: true, vehicles });
@@ -67,6 +79,13 @@ router.get("/:vehicleId", async (req, res) => {
         const vehicle = await Vehicle.findById(
             { _id: req.params.vehicleId }
         )
+            .populate({
+                path: 'jobs',
+                populate: { path: 'vehicleNumber' }
+            }).populate({
+                path: 'quotations',
+                populate: { path: 'job' }
+            })
             .lean()
             .exec();
         if (!vehicle) throw { message: "Vehicle not exists!" };

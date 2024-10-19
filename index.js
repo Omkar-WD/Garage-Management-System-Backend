@@ -13,6 +13,9 @@ const userController = require("./controllers/user.controller");
 const vehicleController = require("./controllers/vehicle.controller");
 const jobController = require("./controllers/job.controller");
 const quotationController = require("./controllers/quotation.controller");
+const brandController = require("./controllers/brand.controller");
+const typeController = require("./controllers/type.controller");
+const modelController = require("./controllers/model.controller");
 const commonController = require("./controllers/common.controller");
 
 app.use(isValidUser);
@@ -21,6 +24,9 @@ app.use("/user", userController);
 app.use("/vehicle", vehicleController);
 app.use("/job", jobController);
 app.use("/quotation", quotationController);
+app.use("/brand", brandController);
+app.use("/type", typeController);
+app.use("/model", modelController);
 app.use("/*", commonController);
 
 app.listen(PORT, async () => {

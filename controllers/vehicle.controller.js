@@ -30,13 +30,16 @@ router.post(
                     .send({ success: false, message: "Vehicle already exist" });
             }
             vehicle = await Vehicle.create(req.body);
-            vehicle = await Vehicle.findById(vehicle._id).populate({
-                path: 'jobs',
-                populate: { path: 'vehicleNumber' }
-            }).populate({
-                path: 'quotations',
-                populate: { path: 'job' }
-            });
+            vehicle = await Vehicle.findById(vehicle._id)
+                .populate("vehicleBrand")
+                .populate({
+                    path: 'jobs',
+                    populate: { path: 'vehicleNumber' }
+                })
+                .populate({
+                    path: 'quotations',
+                    populate: { path: 'job' }
+                });
 
             return res.status(CONSTS.STATUS.CREATED).send({
                 success: true,
@@ -56,6 +59,9 @@ router.get("/all-vehicles", async (req, res) => {
         const vehicles = await Vehicle.find(
             {}
         )
+            .populate("vehicleType")
+            .populate("vehicleBrand")
+            .populate("vehicleModel")
             .populate({
                 path: 'jobs',
                 populate: { path: 'vehicleNumber' }
@@ -79,6 +85,9 @@ router.get("/:vehicleId", async (req, res) => {
         const vehicle = await Vehicle.findById(
             { _id: req.params.vehicleId }
         )
+            .populate("vehicleType")
+            .populate("vehicleBrand")
+            .populate("vehicleModel")
             .populate({
                 path: 'jobs',
                 populate: { path: 'vehicleNumber' }
@@ -120,6 +129,9 @@ router.delete("/delete/:vehicleId", async (req, res) => {
 // Edit Vehicle
 router.patch("/edit/:vehicleId", async (req, res) => {
     Vehicle.findByIdAndUpdate({ _id: req.params.vehicleId }, req.body, { new: true, runValidators: true })
+        .populate("vehicleType")
+        .populate("vehicleBrand")
+        .populate("vehicleModel")
         .then(updatedVehicle => {
             if (!updatedVehicle) {
                 return res.status(CONSTS.STATUS.BAD_REQUEST).send('Vehicle not found');

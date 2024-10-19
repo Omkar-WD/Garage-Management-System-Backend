@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
-// const Vehicle = require("./vehicle.model");
 
 const brandSchema = new mongoose.Schema(
     {
-        brandName: { type: String, required: true },
+        name: { type: String, required: true },
     },
     {
         versionKey: false,

@@ -8,4 +8,13 @@ module.exports = {
     NOT_FOUND: 404,
   },
   SKIP_AUTHORIZATION: ["/user/create", "/user/login"],
+  MODALS: {
+    USER: { NAME: "user" },
+    BRAND: { NAME: "brand" },
+    TYPE: { NAME: "type" },
+    MODEL: { NAME: "model" },
+    VEHICLE: { NAME: "vehicle" },
+    JOB: { NAME: "job" },
+    QUOTATION: { NAME: "quotation" }
+  }
 };

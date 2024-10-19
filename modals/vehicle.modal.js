@@ -2,18 +2,18 @@ const mongoose = require("mongoose");
 
 const vehicleSchema = new mongoose.Schema(
     {
-        vehicleNumber: { type: String, required: true, unique: true },
-        vehicleNumberDetails: {
+        number: { type: String, required: true, unique: true },
+        numberDetails: {
             stateCode: { type: String, required: true },
             districtCode: { type: String, required: true },
             alphaNumber: { type: String, required: true },
             numericNumber: { type: String, required: true },
         },
         customerName: { type: String, required: true },
-        vehicleType: { type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true },
-        vehicleBrand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true },
-        vehicleModel: { type: mongoose.Schema.Types.ObjectId, ref: 'Model', required: true },
-        customerNumber: { type: String, required: true },
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true },
+        brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true },
+        model: { type: mongoose.Schema.Types.ObjectId, ref: 'Model', required: true },
+        customerMobile: { type: String, required: true },
         customerAddress: { type: String, required: true },
         jobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
         quotations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Quotation' }],

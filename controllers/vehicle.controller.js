@@ -1,178 +1,55 @@
-const express = require("express");
-const router = express.Router();
-const { validationResult, Result, check } = require("express-validator");
-const Vehicle = require("../models/vehicle.model");
 const CONSTS = require("../helper/consts");
+const Vehicle = require("../modals/vehicle.modal");
+const commonController = require("./common.controller");
 
-//Create Vehicle
-router.post(
-    "/create",
-    [],
-    async (req, res) => {
-        try {
-            // error handling
-            const errors = validationResult(req);
-
-            if (!errors.isEmpty()) {
-                return res.status(CONSTS.STATUS.BAD_REQUEST).json({
-                    success: false,
-                    message: errors.array()[0].msg,
-                });
-            }
-
-            let vehicle = await Vehicle.findOne({ vehicleNumber: req.body.vehicleNumber })
-                .lean()
-                .exec();
-
-            if (vehicle) {
-                return res
-                    .status(CONSTS.STATUS.BAD_REQUEST)
-                    .send({ success: false, message: "Vehicle already exist" });
-            }
-            vehicle = await Vehicle.create(req.body);
-            vehicle = await Vehicle.findById(vehicle._id)
-                .populate("vehicleBrand")
-                .populate({
-                    path: 'jobs',
-                    populate: { path: 'vehicleNumber' }
-                })
-                .populate({
-                    path: 'quotations',
-                    populate: { path: 'job' }
-                });
-
-            return res.status(CONSTS.STATUS.CREATED).send({
-                success: true,
-                vehicle,
-            });
-        } catch (error) {
-            return res
-                .status(CONSTS.STATUS.BAD_REQUEST)
-                .send({ success: false, message: error.message });
-        }
-    }
-);
-
-//Get Vehicles List
-router.get("/all-vehicles", async (req, res) => {
-    try {
-        const vehicles = await Vehicle.find(
-            {}
-        )
-            .populate("vehicleType")
-            .populate("vehicleBrand")
-            .populate("vehicleModel")
-            .populate({
-                path: 'jobs',
-                populate: { path: 'vehicleNumber' }
-            }).populate({
-                path: 'quotations',
-                populate: { path: 'job' }
-            })
-            .lean()
-            .exec();
-        return res.status(CONSTS.STATUS.OK).send({ success: true, vehicles });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
-
-//Get Vehicle
-router.get("/:vehicleId", async (req, res) => {
-    try {
-        const vehicle = await Vehicle.findById(
-            { _id: req.params.vehicleId }
-        )
-            .populate("vehicleType")
-            .populate("vehicleBrand")
-            .populate("vehicleModel")
-            .populate({
-                path: 'jobs',
-                populate: { path: 'vehicleNumber' }
-            }).populate({
-                path: 'quotations',
-                populate: { path: 'job' }
-            })
-            .lean()
-            .exec();
-        if (!vehicle) throw { message: "Vehicle not exists!" };
-        return res.status(CONSTS.STATUS.OK).send({ success: true, vehicle });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
-
-//Get Vehicle from vehicle number
-router.get("/number/:vehicleNumber", async (req, res) => {
+// Get Vehicle from vehicle number
+const getSingleVehicleFromVehicleNumber = (Modal, callback) => async (req, res) => {
     try {
         const vehicle = await Vehicle.findOne(
-            { vehicleNumber: req.params.vehicleNumber }
+            { number: req.params.vehicleNumber },
+            "_id number numberDetails brand type model customerName customerMobile customerAddress jobs quotations"
         )
-            .populate("vehicleType")
-            .populate("vehicleBrand")
-            .populate("vehicleModel")
-            .populate({
-                path: 'jobs',
-                populate: { path: 'vehicleNumber' }
-            }).populate({
-                path: 'quotations',
-                populate: { path: 'job' }
-            })
+            .populate({ path: 'brand', select: 'name' })
+            .populate({ path: 'type', select: 'type' })
+            .populate({ path: 'model', select: 'name' })
+            .populate({ path: 'jobs', select: '' })
+            .populate({ path: 'quotations', select: '' })
             .lean()
             .exec();
         if (!vehicle) throw { message: "Vehicle not exists!" };
-        return res.status(CONSTS.STATUS.OK).send({ success: true, vehicle });
+        return res.status(CONSTS.STATUS.OK).send({ success: true, data: vehicle });
     } catch (error) {
         return res
             .status(CONSTS.STATUS.BAD_REQUEST)
             .send({ success: false, message: error.message });
     }
-});
+}
 
-// Delete Vehicle
-router.delete("/delete/:vehicleId", async (req, res) => {
-    try {
-        if (!req.user.isAdmin) {
-            return res.status(CONSTS.STATUS.BAD_REQUEST).send({
-                success: false,
-                message: "Only admin user can perform delete operation!",
-            });
-        }
-        await Vehicle.findByIdAndDelete({ _id: req.params.vehicleId });
-        res
-            .status(CONSTS.STATUS.OK)
-            .send({ success: true, message: "vehicle deleted!" });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
-
-// Edit Vehicle
-router.patch("/edit/:vehicleId", async (req, res) => {
-    Vehicle.findByIdAndUpdate({ _id: req.params.vehicleId }, req.body, { new: true, runValidators: true })
-        .populate("vehicleType")
-        .populate("vehicleBrand")
-        .populate("vehicleModel")
-        .then(updatedVehicle => {
-            if (!updatedVehicle) {
-                return res.status(CONSTS.STATUS.BAD_REQUEST).send('Vehicle not found');
-            }
-            res
-                .status(CONSTS.STATUS.OK)
-                .send({ success: true, message: "vehicle details updated!", vehicle: updatedVehicle });
+module.exports = {
+    createVehicle: commonController.create(Vehicle, (req, res) => ({ number: req.body.number })),
+    getAllVehicles: commonController.getAll(Vehicle, (req, res) => (
+        {
+            dataTobeRetrieved: "_id number numberDetails brand type model customerName customerMobile customerAddress jobs quotations",
+            populate1: { path: 'brand', select: 'name' },
+            populate2: { path: 'type', select: 'type' },
+            populate3: { path: 'model', select: 'name' },
+            populate4: { path: 'jobs', select: '' },
+            populate5: { path: 'quotations', select: '' }
         })
-        .catch(error => {
-            return res
-                .status(CONSTS.STATUS.BAD_REQUEST)
-                .send({ success: false, message: error.message });
-        });
-
-});
-
-module.exports = router;
+    ),
+    getSingleVehicle: commonController.getSingle(Vehicle, (req, res) => (
+        {
+            query: { _id: req.params.vehicleId },
+            dataTobeRetrieved: "_id number numberDetails brand type model customerName customerMobile customerAddress jobs quotations",
+            populate1: { path: 'brand', select: 'name' },
+            populate2: { path: 'type', select: 'type' },
+            populate3: { path: 'model', select: 'name' },
+            populate4: { path: 'jobs', select: '' },
+            populate5: { path: 'quotations', select: '' }
+        })
+    ),
+    getSingleVehicleFromVehicleNumber: getSingleVehicleFromVehicleNumber(),
+    editVehicle: commonController.edit(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
+    deleteVehicle: commonController.deleteSingle(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
+    notFound: commonController.notFound()
+};

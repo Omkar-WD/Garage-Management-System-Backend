@@ -1,182 +1,101 @@
-const express = require("express");
-const router = express.Router();
-const { validationResult, Result, check } = require("express-validator");
-const Model = require("../models/model.model");
 const CONSTS = require("../helper/consts");
+const Model = require("../modals/model.modal");
+const commonController = require("./common.controller");
 
-//Create Model
-router.post(
-    "/create",
-    [],
-    async (req, res) => {
-        try {
-            // error handling
-            const errors = validationResult(req);
 
-            if (!errors.isEmpty()) {
-                return res.status(CONSTS.STATUS.BAD_REQUEST).json({
-                    success: false,
-                    message: errors.array()[0].msg,
-                });
-            }
-
-            let model = await Model.findOne({ modelName: req.body.modelName })
-                .lean()
-                .exec();
-
-            if (model) {
-                return res
-                    .status(CONSTS.STATUS.BAD_REQUEST)
-                    .send({ success: false, message: "Model already exist" });
-            }
-            model = await Model.create(req.body);
-            model = await Model.findById(model._id);
-
-            return res.status(CONSTS.STATUS.CREATED).send({
-                success: true,
-                model,
-            });
-        } catch (error) {
-            return res
-                .status(CONSTS.STATUS.BAD_REQUEST)
-                .send({ success: false, message: error.message });
-        }
-    }
-);
-
-//Get Models List
-router.get("/all-models", async (req, res) => {
+// Get Models List from BrandId
+const getModelListFromBrand = () => async (req, res) => {
+    req.logger.debug("Received request to get the model list from brand");
     try {
         const models = await Model.find(
-            {}
+            { brand: req.params.brandId },
+            "_id brand type name"
         )
-            .populate("brandName")
-            .populate("modelType")
+            .populate("brand", "name")
+            .populate("type", "type")
             .lean()
             .exec();
-        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+        const message = `Fulfilled the request to get the model list from brand.`;
+        req.logger.info(message);
+        return res.status(CONSTS.STATUS.OK).send({ success: true, message, data: models });
     } catch (error) {
+        req.logger.error(`Received error while fetching data for model list from brand`, error.message);
         return res
             .status(CONSTS.STATUS.BAD_REQUEST)
             .send({ success: false, message: error.message });
     }
-});
-
-//Get Models List from BrandId
-router.get("/all-models/brand/:brandId", async (req, res) => {
-    try {
-        const models = await Model.find(
-            { brandName: req.params.brandId }
-        )
-            .populate("brandName")
-            .populate("modelType")
-            .lean()
-            .exec();
-        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
+}
 
 //Get Models List from Type
-router.get("/all-models/type/:typeId", async (req, res) => {
+const getModelListFromType = () => async (req, res) => {
+    req.logger.debug("Received request to get the model list from type");
     try {
         const models = await Model.find(
-            { modelType: req.params.typeId }
+            { type: req.params.typeId },
+            "_id brand type name"
         )
-            .populate("brandName")
-            .populate("modelType")
+            .populate("brand", "name")
+            .populate("type", "type")
             .lean()
             .exec();
-        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+        const message = `Fulfilled the request to get the model list from type.`;
+        req.logger.info(message);
+        return res.status(CONSTS.STATUS.OK).send({ success: true, message, data: models });
     } catch (error) {
+        req.logger.error(`Received error while fetching data for model list from type`, error.message);
         return res
             .status(CONSTS.STATUS.BAD_REQUEST)
             .send({ success: false, message: error.message });
     }
-});
+}
 
 //Get Models List from Brand and Type
-router.get("/all-models/brand/:brandId/type/:typeId", async (req, res) => {
+const getModelListFromBrandAndType = () => async (req, res) => {
+    req.logger.debug("Received request to get the model list from brand and type");
     try {
         const models = await Model.find(
             {
-                brandName: req.params.brandId,
-                modelType: req.params.typeId
-            }
+                brand: req.params.brandId,
+                type: req.params.typeId
+            },
+            "_id brand type name"
         )
-            .populate("brandName")
-            .populate("modelType")
+            .populate("brand", "name")
+            .populate("type", "type")
             .lean()
             .exec();
-        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+        const message = `Fulfilled the request to get the model list from brand and type.`;
+        req.logger.info(message);
+        return res.status(CONSTS.STATUS.OK).send({ success: true, message, data: models });
     } catch (error) {
+        req.logger.error(`Received error while fetching data for model list from brand and type`, error.message);
         return res
             .status(CONSTS.STATUS.BAD_REQUEST)
             .send({ success: false, message: error.message });
     }
-});
+}
 
-//Get Model
-router.get("/:modelId", async (req, res) => {
-    try {
-        const model = await Model.findById(
-            { _id: req.params.modelId }
-        )
-            .populate("brandName")
-            .populate("modelType")
-            .lean()
-            .exec();
-        if (!model) throw { message: "Model not exists!" };
-        return res.status(CONSTS.STATUS.OK).send({ success: true, model });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
-
-// Delete Model
-router.delete("/delete/:modelId", async (req, res) => {
-    try {
-        if (!req.user.isAdmin) {
-            return res.status(CONSTS.STATUS.BAD_REQUEST).send({
-                success: false,
-                message: "Only admin user can perform delete operation!",
-            });
-        }
-        await Model.findByIdAndDelete({ _id: req.params.modelId });
-        res
-            .status(CONSTS.STATUS.OK)
-            .send({ success: true, message: "model deleted!" });
-    } catch (error) {
-        return res
-            .status(CONSTS.STATUS.BAD_REQUEST)
-            .send({ success: false, message: error.message });
-    }
-});
-
-// Edit Model
-router.patch("/edit/:modelId", async (req, res) => {
-    Model.findByIdAndUpdate({ _id: req.params.modelId }, req.body, { new: true, runValidators: true })
-        .populate("brandName")
-        .populate("modelType")
-        .then(updatedModel => {
-            if (!updatedModel) {
-                return res.status(CONSTS.STATUS.BAD_REQUEST).send('Model not found');
-            }
-            res
-                .status(CONSTS.STATUS.OK)
-                .send({ success: true, message: "model details updated!", model: updatedModel });
+module.exports = {
+    createModel: commonController.create(Model, (req, res) => ({ name: req.body.name })),
+    getAllModels: commonController.getAll(Model, (req, res) => (
+        {
+            dataTobeRetrieved: "_id brand type name",
+            populate1: { path: 'brand', select: 'name' },
+            populate2: { path: 'type', select: 'type' }
         })
-        .catch(error => {
-            return res
-                .status(CONSTS.STATUS.BAD_REQUEST)
-                .send({ success: false, message: error.message });
-        });
-
-});
-
-module.exports = router;
+    ),
+    getModelListFromBrand: getModelListFromBrand(),
+    getModelListFromType: getModelListFromType(),
+    getModelListFromBrandAndType: getModelListFromBrandAndType(),
+    getSingleModel: commonController.getSingle(Model, (req, res) => (
+        {
+            query: { _id: req.params.modelId },
+            dataTobeRetrieved: "_id brand type name",
+            populate1: { path: 'brand', select: 'name' },
+            populate2: { path: 'type', select: 'type' }
+        })
+    ),
+    editModel: commonController.edit(Model, (req, res) => ({ _id: req.params.modelId })),
+    deleteModel: commonController.deleteSingle(Model, (req, res) => ({ _id: req.params.modelId })),
+    notFound: commonController.notFound()
+};

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const Vehicle = require("./vehicle.model");
-const Job = require("./job.model");
+const Vehicle = require("./vehicle.modal");
+const Job = require("./job.modal");
 
 const quotationSchema = new mongoose.Schema(
     {
         job: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
-        spareSelected: [
+        spareParts: [
             {
                 name: { type: String, required: true },
                 quantity: { type: Number, default: 1 },

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const typeSchema = new mongoose.Schema(
     {
-        vehicleType: { type: String, required: true }
+        type: { type: String, required: true }
     },
     {
         versionKey: false,

@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 
 const modelSchema = new mongoose.Schema(
     {
-        brandName: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
-        modelType: { type: mongoose.Schema.Types.ObjectId, ref: 'Type' },
-        modelName: { type: String, required: true }
+        brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
+        type: { type: mongoose.Schema.Types.ObjectId, ref: 'Type' },
+        name: { type: String, required: true }
     },
     {
         versionKey: false,

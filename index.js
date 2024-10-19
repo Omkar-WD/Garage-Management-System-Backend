@@ -2,32 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const connect = require("./configs/database");
-const isValidUser = require("./middlewares/auth");
+const routes = require("./routes");
 require("dotenv").config({ path: ".env" });
 const PORT = process.env.PORT || 2345;
 
 app.use(express.json());
 app.use(cors());
-
-const userController = require("./controllers/user.controller");
-const vehicleController = require("./controllers/vehicle.controller");
-const jobController = require("./controllers/job.controller");
-const quotationController = require("./controllers/quotation.controller");
-const brandController = require("./controllers/brand.controller");
-const typeController = require("./controllers/type.controller");
-const modelController = require("./controllers/model.controller");
-const commonController = require("./controllers/common.controller");
-
-app.use(isValidUser);
-
-app.use("/user", userController);
-app.use("/vehicle", vehicleController);
-app.use("/job", jobController);
-app.use("/quotation", quotationController);
-app.use("/brand", brandController);
-app.use("/type", typeController);
-app.use("/model", modelController);
-app.use("/*", commonController);
+app.use("/", routes);
 
 app.listen(PORT, async () => {
   try {

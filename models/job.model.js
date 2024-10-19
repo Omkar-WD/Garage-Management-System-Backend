@@ -4,17 +4,12 @@ const Vehicle = require("./vehicle.model");
 const jobSchema = new mongoose.Schema(
     {
         vehicleNumber: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
-        issues: [
-            {
-                name: { type: String, required: true },
-                description: { type: String },
-            }
-        ],
+        issues: { type: [String], required: true },
         advancePay: { type: Number, default: 0 },
         odometer: { type: Number, required: true },
         estimatedDelivery: { type: String, required: true },
-        vehicleReceivedFrom: { type: String, required: true },
-        vehicleCollectedBy: { type: String, required: true },
+        vehicleReceivedFrom: { type: String },
+        vehicleCollectedBy: { type: String },
         remarks: { type: String },
         status: { type: String, default: "pending" }
     },

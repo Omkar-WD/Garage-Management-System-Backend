@@ -106,6 +106,33 @@ router.get("/:vehicleId", async (req, res) => {
     }
 });
 
+//Get Vehicle from vehicle number
+router.get("/number/:vehicleNumber", async (req, res) => {
+    try {
+        const vehicle = await Vehicle.findOne(
+            { vehicleNumber: req.params.vehicleNumber }
+        )
+            .populate("vehicleType")
+            .populate("vehicleBrand")
+            .populate("vehicleModel")
+            .populate({
+                path: 'jobs',
+                populate: { path: 'vehicleNumber' }
+            }).populate({
+                path: 'quotations',
+                populate: { path: 'job' }
+            })
+            .lean()
+            .exec();
+        if (!vehicle) throw { message: "Vehicle not exists!" };
+        return res.status(CONSTS.STATUS.OK).send({ success: true, vehicle });
+    } catch (error) {
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+});
+
 // Delete Vehicle
 router.delete("/delete/:vehicleId", async (req, res) => {
     try {

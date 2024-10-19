@@ -62,6 +62,63 @@ router.get("/all-models", async (req, res) => {
     }
 });
 
+//Get Models List from BrandId
+router.get("/all-models/brand/:brandId", async (req, res) => {
+    try {
+        const models = await Model.find(
+            { brandName: req.params.brandId }
+        )
+            .populate("brandName")
+            .populate("modelType")
+            .lean()
+            .exec();
+        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+    } catch (error) {
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+});
+
+//Get Models List from Type
+router.get("/all-models/type/:typeId", async (req, res) => {
+    try {
+        const models = await Model.find(
+            { modelType: req.params.typeId }
+        )
+            .populate("brandName")
+            .populate("modelType")
+            .lean()
+            .exec();
+        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+    } catch (error) {
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+});
+
+//Get Models List from Brand and Type
+router.get("/all-models/brand/:brandId/type/:typeId", async (req, res) => {
+    try {
+        const models = await Model.find(
+            {
+                brandName: req.params.brandId,
+                modelType: req.params.typeId
+            }
+        )
+            .populate("brandName")
+            .populate("modelType")
+            .lean()
+            .exec();
+        return res.status(CONSTS.STATUS.OK).send({ success: true, models });
+    } catch (error) {
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+});
+
 //Get Model
 router.get("/:modelId", async (req, res) => {
     try {

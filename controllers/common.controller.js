@@ -1,4 +1,5 @@
 const { validationResult, Result, check } = require("express-validator");
+const _ = require("lodash");
 const CONSTS = require("../helper/consts");
 
 const create = (Modal, callback) => async (req, res) => {
@@ -15,16 +16,18 @@ const create = (Modal, callback) => async (req, res) => {
       });
     }
     const query = callback(req, res);
-    let data = await Modal.findOne(query)
-      .lean()
-      .exec();
+    if (!_.isEmpty(query)) {
+      let data = await Modal.findOne(query)
+        .lean()
+        .exec();
 
-    if (data) {
-      const message = `${modalName} already exist`;
-      req.logger.error(message);
-      return res
-        .status(CONSTS.STATUS.BAD_REQUEST)
-        .send({ success: false, message });
+      if (data) {
+        const message = `${modalName} already exist`;
+        req.logger.error(message);
+        return res
+          .status(CONSTS.STATUS.BAD_REQUEST)
+          .send({ success: false, message });
+      }
     }
 
     data = await Modal.create(req.body);

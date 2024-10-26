@@ -33,8 +33,8 @@ module.exports = {
             populate1: { path: 'brand', select: 'name' },
             populate2: { path: 'type', select: 'type' },
             populate3: { path: 'model', select: 'name' },
-            populate4: { path: 'jobs', select: '' },
-            populate5: { path: 'quotations', select: '' }
+            populate4: { path: 'jobs', select: '_id vehicleNumber issues advancePay odometer estimatedDelivery vehicleReceivedFrom vehicleCollectedBy remarks status' },
+            populate5: { path: 'quotations', select: '_id job spareParts' }
         })
     ),
     getSingleVehicle: commonController.getSingle(Vehicle, (req, res) => (
@@ -44,8 +44,8 @@ module.exports = {
             populate1: { path: 'brand', select: 'name' },
             populate2: { path: 'type', select: 'type' },
             populate3: { path: 'model', select: 'name' },
-            populate4: { path: 'jobs', select: '' },
-            populate5: { path: 'quotations', select: '' }
+            populate4: { path: 'jobs', select: '_id vehicleNumber issues advancePay odometer estimatedDelivery vehicleReceivedFrom vehicleCollectedBy remarks status' },
+            populate5: { path: 'quotations', select: '_id job spareParts' }
         })
     ),
     getSingleVehicleFromVehicleNumber: getSingleVehicleFromVehicleNumber(),

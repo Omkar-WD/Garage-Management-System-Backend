@@ -15,6 +15,8 @@ module.exports = {
     MODEL: { NAME: "model" },
     VEHICLE: { NAME: "vehicle" },
     JOB: { NAME: "job" },
-    QUOTATION: { NAME: "quotation" }
+    QUOTATION: { NAME: "quotation" },
+    SUPPLIER: { NAME: "supplier" },
+    INVENTORY: { NAME: "inventory" }
   }
 };

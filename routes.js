@@ -10,6 +10,8 @@ const { setModalNameAsModel } = require("./middlewares/model.middleware");
 const { setModalNameAsVehicle } = require("./middlewares/vehicle.middleware");
 const { setModalNameAsJob } = require("./middlewares/job.middleware");
 const { setModalNameAsQuotation } = require("./middlewares/quotation.middleware");
+const { setModalNameAsSupplier } = require("./middlewares/supplier.middleware");
+const { setModalNameAsInventory } = require("./middlewares/inventory.middleware");
 
 const userRouter = require("./routes/user.route");
 const brandRouter = require("./routes/brand.route");
@@ -18,6 +20,8 @@ const modelRouter = require("./routes/model.route");
 const vehicleRouter = require("./routes/vehicle.route");
 const jobRouter = require("./routes/job.route");
 const quotationRouter = require("./routes/quotation.route");
+const supplierRouter = require("./routes/supplier.route");
+const inventoryRouter = require("./routes/inventory.route");
 const notFoundRouter = require("./routes/notFound.route");
 
 router.use(isValidUser, logger);
@@ -28,6 +32,8 @@ router.use("/model", setModalNameAsModel, modelRouter);
 router.use("/vehicle", setModalNameAsVehicle, vehicleRouter);
 router.use("/job", setModalNameAsJob, jobRouter);
 router.use("/quotation", setModalNameAsQuotation, quotationRouter);
+router.use("/supplier", setModalNameAsSupplier, supplierRouter);
+router.use("/inventory", setModalNameAsInventory, inventoryRouter);
 router.use("/*", notFoundRouter);
 
 module.exports = router;

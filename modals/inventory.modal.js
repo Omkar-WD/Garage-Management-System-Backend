@@ -4,10 +4,14 @@ const Supplier = require("./supplier.modal");
 const inventorySchema = new mongoose.Schema(
     {
         supplierName: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true },
-        name: { type: String },
-        number: { type: String, required: true, unique: true },
-        unitPrice: { type: Number, required: true },
-        quanitity: { type: Number, default: 1 }
+        inventories: [
+            {
+                name: { type: String },
+                number: { type: String, required: true, unique: true },
+                unitPrice: { type: Number, required: true },
+                quanitity: { type: Number, default: 1 }
+            }
+        ]
     },
     {
         versionKey: false,

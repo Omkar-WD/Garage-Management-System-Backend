@@ -79,5 +79,6 @@ module.exports = {
     ),
     editQuotation: commonController.edit(Quotation, (req, res) => ({ _id: req.params.quotationId })),
     deleteQuotation: commonController.deleteSingle(Quotation, (req, res) => ({ _id: req.params.quotationId })),
+    deleteAllQuotations: commonController.deleteAll(Quotation),
     notFound: commonController.notFound()
 };

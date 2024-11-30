@@ -97,5 +97,6 @@ module.exports = {
     ),
     editModel: commonController.edit(Model, (req, res) => ({ _id: req.params.modelId })),
     deleteModel: commonController.deleteSingle(Model, (req, res) => ({ _id: req.params.modelId })),
+    deleteAllModels: commonController.deleteAll(Model),
     notFound: commonController.notFound()
 };

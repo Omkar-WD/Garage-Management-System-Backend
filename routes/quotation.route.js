@@ -8,6 +8,7 @@ quotationRouter.get('/all', quotationController.getAllQuotations);
 quotationRouter.get('/:quotationId', quotationController.getSingleQuotation);
 quotationRouter.patch("/edit/:quotationId", quotationController.editQuotation);
 quotationRouter.delete("/delete/:quotationId", quotationController.deleteQuotation);
+quotationRouter.delete("/delete-all", quotationController.deleteAllQuotations);
 quotationRouter.all("/*", quotationController.notFound);
 
 module.exports = quotationRouter;

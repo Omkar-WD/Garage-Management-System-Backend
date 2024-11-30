@@ -132,6 +132,7 @@ module.exports = {
   getSingleUser: commonController.getSingle(User, (req, res) => ({ query: { _id: req.params.userId }, dataTobeRetrieved: "_id firstName lastName username isAdmin" })),
   editUser: commonController.edit(User, (req, res) => ({ _id: req.params.userId })),
   deleteUser: commonController.deleteSingle(User, (req, res) => ({ _id: req.params.userId })),
+  deleteAllUsers: commonController.deleteAll(User),
   resetPasswordByAdmin: resetPasswordByAdmin(),
   resetPassword: resetPassword(),
   notFound: commonController.notFound()

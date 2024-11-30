@@ -126,5 +126,6 @@ module.exports = {
     ),
     editInventory: updateInventoryItems(),
     deleteInventory: commonController.deleteSingle(Inventory, (req, res) => ({ _id: req.params.inventoryId })),
+    deleteAllInventories: commonController.deleteAll(Inventory),
     notFound: commonController.notFound()
 };

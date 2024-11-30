@@ -31,6 +31,7 @@ userRouter.get("/all", userController.getAllUsers);
 userRouter.get("/:userId", userController.getSingleUser);
 userRouter.patch("/edit/:userId", userController.editUser);
 userRouter.delete("/delete/:userId", userController.deleteUser);
+userRouter.delete("/delete-all", userController.deleteAllUsers);
 userRouter.post("/resetpassword/:userId",
     [
         check("password")

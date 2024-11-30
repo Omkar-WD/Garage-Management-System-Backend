@@ -16,5 +16,6 @@ module.exports = {
     ),
     editType: commonController.edit(Type, (req, res) => ({ _id: req.params.typeId })),
     deleteType: commonController.deleteSingle(Type, (req, res) => ({ _id: req.params.typeId })),
+    deleteAllTypes: commonController.deleteAll(Type),
     notFound: commonController.notFound()
 };

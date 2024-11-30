@@ -8,6 +8,7 @@ typeRouter.get('/all', typeController.getAllTypes);
 typeRouter.get('/:typeId', typeController.getSingleType);
 typeRouter.patch("/edit/:typeId", typeController.editType);
 typeRouter.delete("/delete/:typeId", typeController.deleteType);
+typeRouter.delete("/delete-all", typeController.deleteAllTypes);
 typeRouter.all("/*", typeController.notFound);
 
 module.exports = typeRouter;

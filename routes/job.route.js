@@ -8,6 +8,7 @@ jobRouter.get('/all', jobController.getAllJobs);
 jobRouter.get('/:jobId', jobController.getSingleJob);
 jobRouter.patch("/edit/:jobId", jobController.editJob);
 jobRouter.delete("/delete/:jobId", jobController.deleteJob);
+jobRouter.delete("/delete-all", jobController.deleteAllJobs);
 jobRouter.all("/*", jobController.notFound);
 
 module.exports = jobRouter;

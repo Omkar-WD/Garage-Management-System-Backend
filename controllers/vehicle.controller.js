@@ -51,5 +51,6 @@ module.exports = {
     getSingleVehicleFromVehicleNumber: getSingleVehicleFromVehicleNumber(),
     editVehicle: commonController.edit(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
     deleteVehicle: commonController.deleteSingle(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
+    deleteAllVehicles: commonController.deleteAll(Vehicle),
     notFound: commonController.notFound()
 };

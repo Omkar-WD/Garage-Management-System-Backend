@@ -16,5 +16,6 @@ module.exports = {
     ),
     editBrand: commonController.edit(Brand, (req, res) => ({ _id: req.params.brandId })),
     deleteBrand: commonController.deleteSingle(Brand, (req, res) => ({ _id: req.params.brandId })),
+    deleteAllBrands: commonController.deleteAll(Brand),
     notFound: commonController.notFound()
 };

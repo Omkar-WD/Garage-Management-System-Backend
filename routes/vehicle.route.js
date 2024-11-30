@@ -9,6 +9,7 @@ vehicleRouter.get('/:vehicleId', vehicleController.getSingleVehicle);
 vehicleRouter.get('/number/:vehicleNumber', vehicleController.getSingleVehicleFromVehicleNumber);
 vehicleRouter.patch("/edit/:vehicleId", vehicleController.editVehicle);
 vehicleRouter.delete("/delete/:vehicleId", vehicleController.deleteVehicle);
+vehicleRouter.delete("/delete-all", vehicleController.deleteAllVehicles);
 vehicleRouter.all("/*", vehicleController.notFound);
 
 module.exports = vehicleRouter;

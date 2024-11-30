@@ -11,6 +11,7 @@ modelRouter.get('/all/brand/:brandId/type/:typeId', modelController.getModelList
 modelRouter.get('/:modelId', modelController.getSingleModel);
 modelRouter.patch("/edit/:modelId", modelController.editModel);
 modelRouter.delete("/delete/:modelId", modelController.deleteModel);
+modelRouter.delete("/delete-all", modelController.deleteAllModels);
 modelRouter.all("/*", modelController.notFound);
 
 module.exports = modelRouter;

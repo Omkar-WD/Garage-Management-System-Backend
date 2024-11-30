@@ -8,6 +8,7 @@ supplierRouter.get('/all', supplierController.getAllSuppliers);
 supplierRouter.get('/:supplierId', supplierController.getSingleSupplier);
 supplierRouter.patch("/edit/:supplierId", supplierController.editSupplier);
 supplierRouter.delete("/delete/:supplierId", supplierController.deleteSupplier);
+supplierRouter.delete("/delete-all", supplierController.deleteAllSuppliers);
 supplierRouter.all("/*", supplierController.notFound);
 
 module.exports = supplierRouter;

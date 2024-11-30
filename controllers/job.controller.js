@@ -63,5 +63,6 @@ module.exports = {
     ),
     editJob: commonController.edit(Job, (req, res) => ({ _id: req.params.jobId })),
     deleteJob: commonController.deleteSingle(Job, (req, res) => ({ _id: req.params.jobId })),
+    deleteAllJobs: commonController.deleteAll(Job),
     notFound: commonController.notFound()
 };

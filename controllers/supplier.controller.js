@@ -16,5 +16,6 @@ module.exports = {
     ),
     editSupplier: commonController.edit(Supplier, (req, res) => ({ _id: req.params.supplierId })),
     deleteSupplier: commonController.deleteSingle(Supplier, (req, res) => ({ _id: req.params.supplierId })),
+    deleteAllSuppliers: commonController.deleteAll(Supplier),
     notFound: commonController.notFound()
 };

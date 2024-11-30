@@ -140,6 +140,33 @@ const deleteSingle = (Modal, callback) => async (req, res) => {
   }
 };
 
+const deleteAll = (Modal) => async (req, res) => {
+  const modalName = req.modalName;
+  try {
+    req.logger.debug(`Received request to delete all the ${modalName}s data`);
+    if (!req.user.isAdmin) {
+      return res.status(CONSTS.STATUS.BAD_REQUEST).send({
+        success: false,
+        message: "Only Admin User can do this operation!",
+      });
+    }
+    const result = await Modal.deleteMany({});
+    if (result.deletedCount === 0) {
+      return res.status(CONSTS.STATUS.OK).send({ success: true, message: 'No data found to delete.' });
+    }
+    const message = `all data of ${modalName} deleted by admin!`;
+    req.logger.info(message);
+    return res
+      .status(CONSTS.STATUS.OK)
+      .send({ success: true, message });
+  } catch (error) {
+    req.logger.error(`Received error while deleting ${modalName}s data`, error);
+    return res
+      .status(CONSTS.STATUS.BAD_REQUEST)
+      .send({ success: false, message: error.message });
+  }
+};
+
 const notFound = () => (req, res) => {
   const message = "No route Found!";
   req.logger.error(message);
@@ -148,4 +175,4 @@ const notFound = () => (req, res) => {
     .send({ success: false, message });
 };
 
-module.exports = { create, getAll, getSingle, edit, deleteSingle, notFound };
+module.exports = { create, getAll, getSingle, edit, deleteSingle, deleteAll, notFound };

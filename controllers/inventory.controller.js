@@ -8,20 +8,21 @@ const createOrUpdateInventoryItems = () => async (req, res) => {
         req.logger.debug(`Received request to create the ${modalName} data`);
 
         if (!req.body.supplierName) {
-            throw {
-                message: "Supplier name missing!"
-            }
+            const message = "Supplier name missing!";
+            req.logger.error(`Received error as ${message} for ${modalName}`);
+            throw { message }
         }
 
         if (!req.body.inventories) {
-            throw {
-                message: "Inventories missing!"
-            }
+            const message = "Inventories missing!";
+            req.logger.error(`Received error as ${message} for ${modalName}`);
+            throw { message }
         }
 
         // 1. Check if the inventory exist or not
         let existingInventory = await Inventory.findOne({ supplierName: req.body.supplierName });
         if (!existingInventory) {
+            req.logger.info(`Inventory not available for this supplier ${req.body.supplierName}`);
             let data = await Inventory.create(req.body);
             const message = `${modalName} created`;
             req.logger.info(message);
@@ -38,16 +39,17 @@ const createOrUpdateInventoryItems = () => async (req, res) => {
             let existingItem = existingInventory.inventories.find(item => item.name === inventory.name);
             // 3. If the inventory item exists, update it
             if (existingItem) {
+                req.logger.info(`Inventory is available for this item ${inventory.name}`);
                 existingItem.name = inventory.name || existingItem.name;
                 existingItem.number = inventory.number || existingItem.number;
                 existingItem.unitPrice = inventory.unitPrice || existingItem.unitPrice;
                 existingItem.quantity = (existingItem.quantity || 1) + inventory.quantity;  // Add to quantity if it's provided
 
                 await existingInventory.save();
-                console.log("Updated existing inventory item:", existingItem);
                 response.push(existingItem);
             }
             else {
+                req.logger.info(`Inventory is not available for this item ${inventory.name}, so creating new`);
                 // 4. If the inventory item does not exist, create a new item in the inventories array
                 existingInventory.inventories.push({
                     name: inventory.name,
@@ -61,6 +63,7 @@ const createOrUpdateInventoryItems = () => async (req, res) => {
             }
         }
         const message = "Inventory created/updated successfully";
+        req.logger.info(message);
         return res
             .status(CONSTS.STATUS.OK)
             .send({ success: true, message });
@@ -79,6 +82,7 @@ const updateInventoryItems = () => async (req, res) => {
         req.logger.debug(`Received request to update the ${modalName} data`);
         const message = `${modalName}'s inner items details updated!`;
         if (!req.body.inventories) {
+            req.logger.error(`Received error as inventories are missing for ${modalName}`);
             throw {
                 message: "Inventories missing!"
             }

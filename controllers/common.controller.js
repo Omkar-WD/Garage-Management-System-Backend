@@ -10,6 +10,7 @@ const create = (Modal, callback) => async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
+      req.logger.error(`Received error on validation ${errors}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).json({
         success: false,
         message: errors?.array()[0]?.msg,
@@ -17,6 +18,7 @@ const create = (Modal, callback) => async (req, res) => {
     }
     const query = callback(req, res);
     if (!_.isEmpty(query)) {
+      req.logger.info(`Received query to find the data ${query}`);
       let data = await Modal.findOne(query)
         .lean()
         .exec();
@@ -74,6 +76,7 @@ const getSingle = (Modal, callback) => async (req, res) => {
   try {
     req.logger.debug(`Received request to get the ${modalName} data`);
     const callbackData = callback(req, res);
+    req.logger.info(`Received query to find the data ${callbackData.query}`);
     const data = await Modal.findOne(callbackData.query, callbackData.dataTobeRetrieved)
       .populate(callbackData.populate1)
       .populate(callbackData.populate2)
@@ -97,8 +100,10 @@ const edit = (Modal, callback) => async (req, res) => {
   try {
     req.logger.debug(`Received request to update the ${modalName} data`);
     const query = callback(req, res);
+    req.logger.info(`Received query to find the data ${query}`);
     const updatedData = await Modal.findByIdAndUpdate(query, req.body, { new: true, runValidators: true });
     if (!updatedData) {
+      req.logger.error(`Received error while updating the data of ${modalName}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).send(`${modalName} not found`);
     }
     const message = `${modalName} details updated!`;
@@ -120,12 +125,14 @@ const deleteSingle = (Modal, callback) => async (req, res) => {
   try {
     req.logger.debug(`Received request to delete the ${modalName} data`);
     if (!req.user.isAdmin) {
+      req.logger.error(`Only Admin User can delete the data for ${modalName}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).send({
         success: false,
         message: "Only Admin User can do this operation!",
       });
     }
     const query = callback(req, res);
+    req.logger.info(`Received query to find the data ${query}`);
     await Modal.findByIdAndDelete(query);
     const message = `${modalName} deleted by admin!`;
     req.logger.info(message);
@@ -145,6 +152,7 @@ const deleteAll = (Modal) => async (req, res) => {
   try {
     req.logger.debug(`Received request to delete all the ${modalName}s data`);
     if (!req.user.isAdmin) {
+      req.logger.error(`Only Admin User can delete all the data for ${modalName}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).send({
         success: false,
         message: "Only Admin User can do this operation!",
@@ -152,6 +160,7 @@ const deleteAll = (Modal) => async (req, res) => {
     }
     const result = await Modal.deleteMany({});
     if (result.deletedCount === 0) {
+      req.logger.info(`No data found to delete for ${modalName}`);
       return res.status(CONSTS.STATUS.OK).send({ success: true, message: 'No data found to delete.' });
     }
     const message = `all data of ${modalName} deleted by admin!`;

@@ -16,7 +16,11 @@ const getSingleVehicleFromVehicleNumber = (Modal, callback) => async (req, res) 
             .populate({ path: 'quotations', select: '' })
             .lean()
             .exec();
-        if (!vehicle) throw { message: "Vehicle not exists!" };
+        if (!vehicle) {
+            const message = "Vehicle not exists!";
+            req.logger.error(message);
+            throw { message };
+        }
         return res.status(CONSTS.STATUS.OK).send({ success: true, data: vehicle });
     } catch (error) {
         return res

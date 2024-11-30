@@ -16,6 +16,7 @@ const login = () => async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
+      req.logger.error(`Received error on validation ${errors}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).json({
         success: false,
         message: errors.array()[0].msg,
@@ -24,20 +25,23 @@ const login = () => async (req, res) => {
     let user = await User.findOne({ username: req.body.username });
 
     // If user is not found then return error
-    if (!user)
+    if (!user) {
+      req.logger.error(`Received error as user not found!`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).send({
         success: false,
         message: "Username or Password is incorrect!",
       });
+    }
 
     // if user is found then we will match the passwords
     const match = user.checkPassword(req.body.password);
-
-    if (!match)
+    if (!match) {
+      const message = "Password is incorrect!";
+      req.logger.error(`Received error as ${message}`);
       return res
         .status(CONSTS.STATUS.BAD_REQUEST)
-        .send({ success: false, message: "Password is incorrect!" });
-
+        .send({ success: false, message });
+    }
     const token = newToken(user);
 
     user = {
@@ -63,14 +67,17 @@ const resetPasswordByAdmin = () => async (req, res) => {
   try {
     req.logger.debug("Received request to reset the password by admin");
     if (!req.user.isAdmin) {
+      const message = "Only Admin User can reset the password for other users!";
+      req.logger.error(message);
       return res.status(CONSTS.STATUS.BAD_REQUEST).send({
         success: false,
-        message: "Only Admin User can reset the password for other users!",
+        message
       });
     }
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
+      req.logger.error(`Received error on validation ${errors}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).json({
         success: false,
         messsage: errors.array()[0]?.msg,
@@ -99,6 +106,7 @@ const resetPassword = () => async (req, res) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
+      req.logger.error(`Received error on validation ${errors}`);
       return res.status(CONSTS.STATUS.BAD_REQUEST).json({
         success: false,
         messsage: errors.array()[0].msg,

@@ -33,7 +33,7 @@ quotationSchema.post('save', async function (doc) {
 });
 
 // Hook to remove quotation ID from Vehicle's quotations array when a Quotation is deleted
-quotationSchema.post('remove', async function (doc) {
+quotationSchema.post('findOneAndDelete', async function (doc) {
     if (doc.job) {
         const job = await Job.findById(doc.job).lean().exec();
         Vehicle.findByIdAndUpdate(
@@ -43,5 +43,14 @@ quotationSchema.post('remove', async function (doc) {
         ).exec();
     }
 });
+
+// Hook to empty the all quotations from Vehicle's quotations array when a all the quotations are deleted
+quotationSchema.post('deleteMany', async function (doc) {
+    await Vehicle.updateMany(
+        {}, // Empty query: this will affect all Vehicle records
+        { $set: { quotations: [] } } // Empty the quotations array
+    );
+});
+
 
 module.exports = mongoose.model("Quotation", quotationSchema);

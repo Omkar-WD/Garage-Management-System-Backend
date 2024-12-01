@@ -31,7 +31,7 @@ jobSchema.post('save', function (doc) {
 });
 
 // Hook to remove job ID from Vehicle's jobs array when a Job is deleted
-jobSchema.post('remove', function (doc) {
+jobSchema.post('findOneAndDelete', function (doc) {
     if (doc.vehicleNumber) {
         Vehicle.findByIdAndUpdate(
             doc.vehicleNumber,
@@ -39,6 +39,14 @@ jobSchema.post('remove', function (doc) {
             { new: true }
         ).exec();
     }
+});
+
+// Hook to empty the all Jobs from Vehicle's job array when a all the jobs are deleted
+jobSchema.post('deleteMany', async function (doc) {
+    await Vehicle.updateMany(
+        {}, // Empty query: this will affect all Vehicle records
+        { $set: { jobs: [] } } // Empty the jobs array
+    );
 });
 
 module.exports = mongoose.model("Job", jobSchema);

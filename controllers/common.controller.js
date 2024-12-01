@@ -133,7 +133,7 @@ const deleteSingle = (Modal, callback) => async (req, res) => {
     }
     const query = callback(req, res);
     req.logger.info(`Received query to find the data ${query}`);
-    await Modal.findByIdAndDelete(query);
+    await Modal.findOneAndDelete(query);
     const message = `${modalName} deleted by admin!`;
     req.logger.info(message);
     return res

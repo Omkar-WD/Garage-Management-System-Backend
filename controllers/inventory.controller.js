@@ -115,6 +115,33 @@ const updateInventoryItems = () => async (req, res) => {
     }
 };
 
+const deleteItem = () => async (req, res) => {
+    const modalName = req.modalName;
+    try {
+        req.logger.debug(`Received request to delete the inventory item`);
+        const result = await Inventory.updateOne(
+            { _id: req.params.inventoryId },  // Find the document by inventoryId
+            { $pull: { inventories: { _id: req.params.itemId } } }  // Remove the item from inventories by itemId
+        );
+        let message = ""
+        if (result.nModified === 0) {
+            message = "No items were deleted";
+        } else {
+            message = "inventory Item successfully deleted";
+        }
+        req.logger.info(message, result);
+        return res
+            .status(CONSTS.STATUS.OK)
+            .send({ success: true, message });
+    }
+    catch (error) {
+        req.logger.error(`Received error while deleting ${modalName}'s inner items details data`, error);
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     createInventory: createOrUpdateInventoryItems(),
     getAllInventories: commonController.getAll(Inventory, (req, res) => (
@@ -130,6 +157,7 @@ module.exports = {
     ),
     editInventory: updateInventoryItems(),
     deleteInventory: commonController.deleteSingle(Inventory, (req, res) => ({ _id: req.params.inventoryId })),
+    deleteInventoryItem: deleteItem(),
     deleteAllInventories: commonController.deleteAll(Inventory),
     notFound: commonController.notFound()
 };

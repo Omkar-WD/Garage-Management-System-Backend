@@ -29,6 +29,32 @@ const getSingleVehicleFromVehicleNumber = (Modal, callback) => async (req, res) 
     }
 }
 
+const getAllVehicleFromBrand = () => async (req, res) => {
+    try {
+        const vehicle = await Vehicle.find(
+            { brand: req.params.brandId },
+            "_id number numberDetails brand type model customerName customerMobile customerAddress jobs quotations"
+        )
+            .populate({ path: 'brand', select: 'name' })
+            .populate({ path: 'type', select: 'type' })
+            .populate({ path: 'model', select: 'name' })
+            .populate({ path: 'jobs', select: '' })
+            .populate({ path: 'quotations', select: '' })
+            .lean()
+            .exec();
+        if (!vehicle) {
+            const message = "Vehicle not exists!";
+            req.logger.error(message);
+            throw { message };
+        }
+        return res.status(CONSTS.STATUS.OK).send({ success: true, data: vehicle, vehicleCount: vehicle.length });
+    } catch (error) {
+        return res
+            .status(CONSTS.STATUS.BAD_REQUEST)
+            .send({ success: false, message: error.message });
+    }
+}
+
 module.exports = {
     createVehicle: commonController.create(Vehicle, (req, res) => ({ number: req.body.number })),
     getAllVehicles: commonController.getAll(Vehicle, (req, res) => (
@@ -53,6 +79,7 @@ module.exports = {
         })
     ),
     getSingleVehicleFromVehicleNumber: getSingleVehicleFromVehicleNumber(),
+    getAllVehicleFromBrand: getAllVehicleFromBrand(),
     editVehicle: commonController.edit(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
     deleteVehicle: commonController.deleteSingle(Vehicle, (req, res) => ({ _id: req.params.vehicleId })),
     deleteAllVehicles: commonController.deleteAll(Vehicle),
